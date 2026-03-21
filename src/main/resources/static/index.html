@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Work Logger</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            padding: 40px;
+        }
+
+        .container {
+            width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 15px;
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>🧠 AI Daily Work Logger</h2>
+
+    <textarea id="input" placeholder="Enter your work..."></textarea>
+
+    <button onclick="submitData()">Submit</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    function submitData() {
+        const input = document.getElementById("input").value;
+
+        fetch("http://localhost:8080/api/log", {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: input
+        })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("result").innerText = data;
+            })
+            .catch(error => {
+                document.getElementById("result").innerText = "Error: " + error;
+            });
+    }
+</script>
+
+</body>
+</html>
