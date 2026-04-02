@@ -1,33 +1,77 @@
-HELP.md
+# ===========================
+# AI Excel Logger - .gitignore
+# Spring Boot + Maven + Swing
+# ===========================
+
+# --- Compiled Output ---
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.class
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# --- Maven ---
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+mvnw
+mvnw.cmd
 
-### IntelliJ IDEA ###
-.idea
+# --- Spring Boot ---
+*.log
+spring.log
+
+# --- API Keys & Secrets (never commit real keys) ---
+application-local.properties
+application-secret.properties
+*.env
+.env
+secrets.properties
+
+# NOTE: application.properties IS committed but with placeholder values only.
+# Replace nvidia.nim.api.key=YOUR_KEY_HERE with your actual key locally.
+
+# --- IDE: IntelliJ IDEA ---
+.idea/
 *.iws
 *.iml
 *.ipr
+out/
+.idea_modules/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# --- IDE: Eclipse ---
+.classpath
+.project
+.settings/
+bin/
+*.launch
 
-### VS Code ###
+# --- IDE: VS Code ---
 .vscode/
+*.code-workspace
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Excel Output Files (generated at runtime) ---
+*.xlsx
+*.xls
+
+# --- Logs ---
+logs/
+*.log
+*.log.*
+
+# --- Temporary Files ---
+*.tmp
+*.bak
+*.swp
+*~
+
+# --- SonarQube ---
+.sonar/
+sonar-project.properties
