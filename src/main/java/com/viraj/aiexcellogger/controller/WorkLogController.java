@@ -23,54 +23,32 @@ public class WorkLogController {
     @PostMapping("/log")
     public String logWork(@RequestBody String input) {
         try {
-
             String rawResponse = openAIService.getStructuredJson(input);
-
             JsonNode root = mapper.readTree(rawResponse);
 
-            // 🔥 Safe response extraction
-            JsonNode responseNode = root.get("response");
-
-            if (responseNode == null) {
-                throw new RuntimeException("Invalid Ollama response: " + rawResponse);
+            // ✅ NVIDIA NIM response format
+            JsonNode choices = root.get("choices");
+            if (choices == null) {
+                throw new RuntimeException("Invalid NVIDIA response: " + rawResponse);
             }
+            String content = choices.get(0).get("message").get("content").asText();
 
-            String content = responseNode.asText();
-
-            // Extract JSON
             String json = extractJson(content);
-
-            // Clean JSON
             json = cleanJson(json);
 
-            // Convert to object
             WorkLog log = mapper.readValue(json, WorkLog.class);
 
-            // 🔥 Ensure bullet formatting
             log.setTaskSummary(ensureBullets(log.getTaskSummary()));
             log.setDescription(ensureBullets(log.getDescription()));
-
-            // 🔥 Fix date
             log.setDate(java.time.LocalDate.now().toString());
 
-            // 🔥 Fix hours
-            if (log.getHours() == 0) {
-                log.setHours(8);
-            }
-
-            // 🔥 Fix project name
-            if (log.getProjectName() == null || log.getProjectName().isEmpty()) {
+            if (log.getHours() == 0) log.setHours(8);
+            if (log.getProjectName() == null || log.getProjectName().isEmpty())
                 log.setProjectName("General Work");
-            }
-
-            // 🔥 Fix next action
-            if (log.getNextAction() == null || log.getNextAction().isEmpty()) {
+            if (log.getNextAction() == null || log.getNextAction().isEmpty())
                 log.setNextAction("Continue work");
-            }
 
-            // Write to Excel
             excelService.writeToExcel(log);
-
             return "Saved to Excel ✅";
 
         } catch (Exception e) {
@@ -78,20 +56,15 @@ public class WorkLogController {
         }
     }
 
-    // 🔥 Extract JSON from messy AI response
     private String extractJson(String text) {
-
         int start = text.indexOf("{");
         int end = text.lastIndexOf("}");
-
         if (start != -1 && end != -1 && end > start) {
             return text.substring(start, end + 1);
         }
-
         throw new RuntimeException("Invalid JSON from AI: " + text);
     }
 
-    // 🔥 Clean invalid JSON (fix bullets etc.)
     private String cleanJson(String json) {
         return json.replaceAll("(?<=:)\\s*•", "\"•")
                 .replaceAll("(?<=\\n)•", "•")
@@ -99,22 +72,22 @@ public class WorkLogController {
                 .replaceAll("\"\\s*,", "\",");
     }
 
-    // 🔥 Ensure bullet points formatting
     private String ensureBullets(String text) {
         if (text == null || text.trim().isEmpty()) return text;
 
-        // Already bullet formatted
+        //  Replace any bullet-like characters with proper •
+        text = text.replaceAll("[\\?\\*\\-–•]\\s*", "• ");
+
+        // Already properly formatted
         if (text.contains("•")) return text;
 
         String[] parts = text.split("[,.]");
         StringBuilder result = new StringBuilder();
-
         for (String part : parts) {
             if (!part.trim().isEmpty()) {
                 result.append("• ").append(part.trim()).append("\n");
             }
         }
-
         return result.toString().trim();
     }
 }
